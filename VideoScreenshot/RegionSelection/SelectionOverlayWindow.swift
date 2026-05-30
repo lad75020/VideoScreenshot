@@ -12,11 +12,31 @@ final class SelectionOverlayWindow: NSWindow {
         isReleasedWhenClosed = false
         isOpaque = false; backgroundColor = NSColor.black.withAlphaComponent(0.15); level = .screenSaver
         ignoresMouseEvents = false; collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        contentView = NSHostingView(rootView: SelectionOverlayView(viewModel: viewModel, onComplete: { [weak self] area in
+        contentView = SelectionCursorHostingView(rootView: SelectionOverlayView(viewModel: viewModel, onComplete: { [weak self] area in
             guard let self else { return }
             self.close()
             self.onComplete(area)
         }))
+    }
+
+    override func close() {
+        NSCursor.arrow.set()
+        super.close()
+    }
+}
+
+private final class SelectionCursorHostingView<Content: View>: NSHostingView<Content> {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        window?.invalidateCursorRects(for: self)
+        if window != nil {
+            NSCursor.crosshair.set()
+        }
+    }
+
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        addCursorRect(bounds, cursor: .crosshair)
     }
 }
 
