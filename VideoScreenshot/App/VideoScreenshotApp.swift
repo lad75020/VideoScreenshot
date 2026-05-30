@@ -7,5 +7,7 @@ struct VideoScreenshotApp: App {
         WindowGroup {
             MainWindowView().environmentObject(coordinator)
         }
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 900, height: 680)
     }
 }

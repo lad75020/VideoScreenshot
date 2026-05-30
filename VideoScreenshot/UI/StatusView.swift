@@ -4,13 +4,17 @@ struct StatusView: View {
     @EnvironmentObject var coordinator: CaptureCoordinator
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Divider()
-            HStack(alignment: .top, spacing: 12) {
-                statusIcon
-                    .frame(width: 24, height: 24)
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(Color.primary.opacity(0.08))
+                .frame(height: 0.5)
 
-                VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center, spacing: 12) {
+                statusIcon
+                    .frame(width: 30, height: 30)
+                    .background(iconBackground, in: Circle())
+
+                VStack(alignment: .leading, spacing: 3) {
                     Text(coordinator.statusMessage)
                         .font(.system(size: 12, weight: .medium))
                         .textSelection(.enabled)
@@ -19,7 +23,7 @@ struct StatusView: View {
                         .accessibilityLabel("Capture status")
 
                     if let error = coordinator.lastError {
-                        Text("Recovery: \(error.recoveryAction)")
+                        Text(error.recoveryAction)
                             .font(.system(size: 11))
                             .foregroundStyle(.red)
                             .textSelection(.enabled)
@@ -27,10 +31,15 @@ struct StatusView: View {
                     }
                 }
 
-                Spacer(minLength: 8)
+                Spacer(minLength: 12)
 
-                if coordinator.savedRecording != nil {
+                if let recording = coordinator.savedRecording {
                     HStack(spacing: 8) {
+                        Text(fileSummary(recording))
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+
                         Button {
                             coordinator.copySavedPath()
                         } label: {
@@ -48,12 +57,25 @@ struct StatusView: View {
                         .buttonStyle(.borderedProminent)
                         .accessibilityLabel("Reveal File")
                     }
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 22)
+            .padding(.vertical, 12)
         }
         .background(.ultraThinMaterial)
+        .animation(.easeInOut(duration: 0.2), value: coordinator.savedRecording?.id)
+        .animation(.easeInOut(duration: 0.2), value: coordinator.state)
+    }
+
+    private var iconBackground: Color {
+        switch coordinator.state {
+        case .error, .recording: return .red.opacity(0.13)
+        case .completed, .completedWithWarning: return .green.opacity(0.13)
+        case .validating, .stopping, .finalizing: return .orange.opacity(0.13)
+        case .areaSelected: return .blue.opacity(0.13)
+        case .idle: return .secondary.opacity(0.11)
+        }
     }
 
     @ViewBuilder
@@ -61,26 +83,31 @@ struct StatusView: View {
         switch coordinator.state {
         case .error:
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 18))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.red)
         case .completed, .completedWithWarning:
             Image(systemName: "checkmark.seal.fill")
-                .font(.system(size: 18))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.green)
         case .recording:
             Image(systemName: "record.circle.fill")
-                .font(.system(size: 18))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.red)
         case .validating, .stopping, .finalizing:
             ProgressView().controlSize(.small)
         case .areaSelected:
             Image(systemName: "checkmark.circle")
-                .font(.system(size: 18))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.blue)
         case .idle:
             Image(systemName: "info.circle")
-                .font(.system(size: 18))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func fileSummary(_ recording: SavedRecording) -> String {
+        let size = ByteCountFormatter.string(fromByteCount: recording.fileSizeBytes, countStyle: .file)
+        return "\(recording.format.rawValue.uppercased()) · \(size)"
     }
 }
