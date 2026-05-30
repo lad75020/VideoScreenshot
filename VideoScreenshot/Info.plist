@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleDisplayName</key><string>VideoScreenshot</string>
+  <key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleName</key><string>VideoScreenshot</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>LSMinimumSystemVersion</key><string>26.0</string>
+  <key>NSAudioCaptureUsageDescription</key><string>VideoScreenshot can capture system audio for MP4 recordings when you enable Record System Audio.</string>
+  <key>UTExportedTypeDeclarations</key><array>
+    <dict><key>UTTypeIdentifier</key><string>public.mpeg-4</string><key>UTTypeDescription</key><string>MP4 Video</string></dict>
+    <dict><key>UTTypeIdentifier</key><string>com.compuserve.gif</string><key>UTTypeDescription</key><string>Animated GIF</string></dict>
+  </array>
+</dict></plist>
